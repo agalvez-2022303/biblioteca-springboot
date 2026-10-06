@@ -18,18 +18,7 @@ import java.util.Optional;
 
 public interface PrestamoRepository extends JpaRepository<PrestamoLibro, Long> {
 
-    @EntityGraph(attributePaths = {"libro", "usuario"})
-    List<PrestamoLibro> findByUsuario_UsuarioId(Long usuarioId);
-
-    @EntityGraph(attributePaths = {"libro", "usuario"})
-    List<PrestamoLibro> findByUsuario_UsuarioIdAndEstado(Long usuarioId, EstadoPrestamo estado);
-
-    long countByUsuario_UsuarioIdAndEstado(Long usuarioId, EstadoPrestamo estado);
-
     long countByUsuario_UsuarioIdAndEstadoNot(Long usuarioId, EstadoPrestamo estado);
-
-    @EntityGraph(attributePaths = {"libro", "usuario"})
-    List<PrestamoLibro> findByFechaDevolucionEsperadaBeforeAndEstadoNot(LocalDate fecha, EstadoPrestamo estado);
 
     @EntityGraph(attributePaths = {"libro", "usuario"})
     Page<PrestamoLibro> findByFechaDevolucionEsperadaBeforeAndEstadoIn(LocalDate fecha, List<EstadoPrestamo> estados, Pageable pageable);
