@@ -38,6 +38,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/libros/**").authenticated()
                 .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/v1/prestamos").hasAnyRole("ADMIN", "BIBLIOTECARIO")
                 .requestMatchers(org.springframework.http.HttpMethod.PATCH, "/api/v1/prestamos/*/devolucion").hasAnyRole("ADMIN", "BIBLIOTECARIO")
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/prestamos/atrasados").hasAnyRole("ADMIN", "BIBLIOTECARIO")
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/prestamos/mis-prestamos").authenticated()
                 .requestMatchers("/api/v1/prestamos/**").authenticated()
                 .anyRequest().authenticated()
             )

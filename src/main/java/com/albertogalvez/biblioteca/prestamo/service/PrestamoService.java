@@ -112,6 +112,26 @@ public class PrestamoService {
         return aRespuesta(prestamoRepository.save(prestamo));
     }
 
+    @Transactional(readOnly = true)
+    public java.util.List<PrestamoResponse> misPrestamos(String email) {
+        if (email == null || email.isBlank()) {
+            throw new BusinessRuleException("El email del usuario autenticado es obligatorio");
+        }
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con email: " + email));
+        return prestamoRepository.findByUsuario_UsuarioId(usuario.getUsuarioId()).stream()
+                .map(this::aRespuesta)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public java.util.List<PrestamoResponse> atrasados() {
+        return prestamoRepository.findByFechaDevolucionEsperadaBeforeAndEstadoNot(LocalDate.now(), EstadoPrestamo.DEVUELTO)
+                .stream()
+                .map(this::aRespuesta)
+                .toList();
+    }
+
     private PrestamoResponse aRespuesta(PrestamoLibro p) {
         return new PrestamoResponse(p.getIdPrestamo(), p.getUsuario().getUsuarioId(), p.getLibro().getLibroId(),
                 p.getFechaPrestamo(), p.getFechaDevolucionEsperada(), p.getFechaDevolucionReal(), p.getEstado());

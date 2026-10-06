@@ -25,4 +25,10 @@ public interface PrestamoRepository extends JpaRepository<PrestamoLibro, Long> {
 
     @EntityGraph(attributePaths = {"libro", "usuario"})
     Page<PrestamoLibro> findByUsuario_UsuarioId(Long usuarioId, Pageable pageable);
+
+    @org.springframework.data.jpa.repository.Modifying(clearAutomatically = true)
+    @org.springframework.data.jpa.repository.Query("UPDATE PrestamoLibro p SET p.estado = :atrasado WHERE p.estado = :activo AND p.fechaDevolucionEsperada < :hoy")
+    int marcarAtrasados(@org.springframework.data.repository.query.Param("atrasado") EstadoPrestamo atrasado,
+                        @org.springframework.data.repository.query.Param("activo") EstadoPrestamo activo,
+                        @org.springframework.data.repository.query.Param("hoy") LocalDate hoy);
 }

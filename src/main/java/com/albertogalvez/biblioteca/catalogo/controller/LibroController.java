@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/libros")
-public class LibroController {
+public class                                                                                                                                                                                                                                                                                    LibroController {
 
     private final LibroService libroService;
 
