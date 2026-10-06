@@ -1,0 +1,27 @@
+package com.albertogalvez.biblioteca.prestamo.controller;
+
+import com.albertogalvez.biblioteca.prestamo.dto.PrestamoRequest;
+import com.albertogalvez.biblioteca.prestamo.dto.PrestamoResponse;
+import com.albertogalvez.biblioteca.prestamo.service.PrestamoService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api/v1/prestamos")
+public class PrestamoController {
+
+    private final PrestamoService prestamoService;
+
+    public PrestamoController(PrestamoService prestamoService) {
+        this.prestamoService = prestamoService;
+    }
+
+    @PostMapping
+    public ResponseEntity<PrestamoResponse> crear(@RequestBody PrestamoRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(prestamoService.crear(request));
+    }
+}
