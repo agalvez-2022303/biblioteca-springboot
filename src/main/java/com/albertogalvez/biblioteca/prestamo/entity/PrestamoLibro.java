@@ -20,10 +20,9 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "prestamos_libros", indexes = {
-        @Index(name = "idx_prestamo_usuario", columnList = "usuario_id"),
+        @Index(name = "idx_prestamo_usuario_estado", columnList = "usuario_id, estado"),
         @Index(name = "idx_prestamo_libro", columnList = "libro_id"),
-        @Index(name = "idx_prestamo_estado", columnList = "estado"),
-        @Index(name = "idx_prestamo_fecha_esperada", columnList = "fecha_devolucion_esperada")
+        @Index(name = "idx_prestamo_estado_fecha", columnList = "estado, fecha_devolucion_esperada")
 })
 public class PrestamoLibro {
 
