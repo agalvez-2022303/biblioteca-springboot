@@ -6,6 +6,7 @@ import com.albertogalvez.biblioteca.catalogo.entity.Libro;
 import com.albertogalvez.biblioteca.catalogo.repository.LibroRepository;
 import com.albertogalvez.biblioteca.comun.exception.BusinessRuleException;
 import com.albertogalvez.biblioteca.comun.exception.ResourceNotFoundException;
+import com.albertogalvez.biblioteca.comun.validacion.Validaciones;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -27,13 +28,13 @@ public class LibroService {
         boolean hayCategoria = categoria != null && !categoria.isBlank();
 
         if (hayTitulo && hayCategoria) {
-            pagina = libroRepository.findByTituloContainingIgnoreCaseAndCategoriaIgnoreCase(titulo, categoria, paginable);
+            pagina = libroRepository.findByActivoTrueAndTituloContainingIgnoreCaseAndCategoriaIgnoreCase(titulo, categoria, paginable);
         } else if (hayTitulo) {
-            pagina = libroRepository.findByTituloContainingIgnoreCase(titulo, paginable);
+            pagina = libroRepository.findByActivoTrueAndTituloContainingIgnoreCase(titulo, paginable);
         } else if (hayCategoria) {
-            pagina = libroRepository.findByCategoriaIgnoreCase(categoria, paginable);
+            pagina = libroRepository.findByActivoTrueAndCategoriaIgnoreCase(categoria, paginable);
         } else {
-            pagina = libroRepository.findAll(paginable);
+            pagina = libroRepository.findByActivoTrue(paginable);
         }
         return pagina.map(this::aRespuesta);
     }
@@ -44,6 +45,7 @@ public class LibroService {
             throw new BusinessRuleException("El ID del libro es obligatorio");
         }
         Libro libro = libroRepository.findById(id)
+                .filter(l -> Boolean.TRUE.equals(l.getActivo()))
                 .orElseThrow(() -> new ResourceNotFoundException("Libro no encontrado con id: " + id));
         return aRespuesta(libro);
     }
@@ -67,15 +69,19 @@ public class LibroService {
             throw new BusinessRuleException("El ID del libro es obligatorio");
         }
         validar(request);
-        Libro libro = libroRepository.findById(id)
+        Libro libro = libroRepository.findByIdConBloqueo(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Libro no encontrado con id: " + id));
+
+        int prestados = libro.getStockTotal() - libro.getStockDisponible();
+        if (request.stockTotal() < prestados) {
+            throw new BusinessRuleException("El stock total no puede ser menor a los ejemplares prestados (" + prestados + ")");
+        }
+
         libro.setTitulo(request.titulo());
         libro.setAutor(request.autor());
         libro.setCategoria(request.categoria());
-        if (request.stockTotal() < libro.getStockDisponible()) {
-            throw new BusinessRuleException("El stock total no puede ser menor al stock disponible");
-        }
         libro.setStockTotal(request.stockTotal());
+        libro.setStockDisponible(request.stockTotal() - prestados);
         return aRespuesta(libroRepository.save(libro));
     }
 
@@ -84,7 +90,7 @@ public class LibroService {
         if (id == null) {
             throw new BusinessRuleException("El ID del libro es obligatorio");
         }
-        Libro libro = libroRepository.findById(id)
+        Libro libro = libroRepository.findByIdConBloqueo(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Libro no encontrado con id: " + id));
         libro.setActivo(false);
         libroRepository.save(libro);
@@ -94,15 +100,9 @@ public class LibroService {
         if (request == null) {
             throw new BusinessRuleException("La solicitud es obligatoria");
         }
-        if (request.titulo() == null || request.titulo().isBlank()) {
-            throw new BusinessRuleException("El título es obligatorio");
-        }
-        if (request.autor() == null || request.autor().isBlank()) {
-            throw new BusinessRuleException("El autor es obligatorio");
-        }
-        if (request.categoria() == null || request.categoria().isBlank()) {
-            throw new BusinessRuleException("La categoría es obligatoria");
-        }
+        Validaciones.texto(request.titulo(), "El título es obligatorio", "El título no puede superar", 200);
+        Validaciones.texto(request.autor(), "El autor es obligatorio", "El autor no puede superar", 150);
+        Validaciones.texto(request.categoria(), "La categoría es obligatoria", "La categoría no puede superar", 100);
         if (request.stockTotal() == null) {
             throw new BusinessRuleException("El stock total es obligatorio");
         }

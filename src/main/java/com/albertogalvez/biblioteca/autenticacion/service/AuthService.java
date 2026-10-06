@@ -7,6 +7,7 @@ import com.albertogalvez.biblioteca.autenticacion.dto.RegisterResponse;
 import com.albertogalvez.biblioteca.autenticacion.security.JwtService;
 import com.albertogalvez.biblioteca.comun.exception.BusinessRuleException;
 import com.albertogalvez.biblioteca.comun.exception.UnauthorizedException;
+import com.albertogalvez.biblioteca.comun.validacion.Validaciones;
 import com.albertogalvez.biblioteca.usuario.entity.EstadoUsuario;
 import com.albertogalvez.biblioteca.usuario.entity.Rol;
 import com.albertogalvez.biblioteca.usuario.entity.Usuario;
@@ -31,12 +32,8 @@ public class AuthService {
         if (request == null) {
             throw new BusinessRuleException("La solicitud es obligatoria");
         }
-        if (request.email() == null || request.email().isBlank()) {
-            throw new BusinessRuleException("El email es obligatorio");
-        }
-        if (request.password() == null || request.password().isBlank()) {
-            throw new BusinessRuleException("La password es obligatoria");
-        }
+        Validaciones.email(request.email());
+        Validaciones.password(request.password());
         if (usuarioRepository.existsByEmail(request.email())) {
             throw new BusinessRuleException("El email ya está registrado");
         }

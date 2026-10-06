@@ -16,13 +16,13 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "prestamos_libros", indexes = {
-        @Index(name = "idx_prestamo_usuario", columnList = "usuario_id"),
+        @Index(name = "idx_prestamo_usuario_estado", columnList = "usuario_id, estado"),
         @Index(name = "idx_prestamo_libro", columnList = "libro_id"),
-        @Index(name = "idx_prestamo_estado", columnList = "estado"),
-        @Index(name = "idx_prestamo_fecha_esperada", columnList = "fecha_devolucion_esperada")
+        @Index(name = "idx_prestamo_estado_fecha", columnList = "estado, fecha_devolucion_esperada")
 })
 public class PrestamoLibro {
 
@@ -44,7 +44,7 @@ public class PrestamoLibro {
     @Column(nullable = false)
     private LocalDate fechaDevolucionEsperada;
 
-    private LocalDate fechaDevolucionReal;
+    private LocalDateTime fechaDevolucionReal;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
@@ -93,11 +93,11 @@ public class PrestamoLibro {
         this.fechaDevolucionEsperada = fechaDevolucionEsperada;
     }
 
-    public LocalDate getFechaDevolucionReal() {
+    public LocalDateTime getFechaDevolucionReal() {
         return fechaDevolucionReal;
     }
 
-    public void setFechaDevolucionReal(LocalDate fechaDevolucionReal) {
+    public void setFechaDevolucionReal(LocalDateTime fechaDevolucionReal) {
         this.fechaDevolucionReal = fechaDevolucionReal;
     }
 
