@@ -124,6 +124,11 @@ public class PrestamoService {
     }
 
     @Transactional(readOnly = true)
+    public Page<PrestamoResponse> listar(Long usuarioId, EstadoPrestamo estado, Pageable paginable) {
+        return prestamoRepository.buscar(usuarioId, estado, paginable).map(this::aRespuesta);
+    }
+
+    @Transactional(readOnly = true)
     public Page<PrestamoResponse> misPrestamos(String email, Pageable paginable, EstadoPrestamo estado) {
         if (email == null || email.isBlank()) {
             throw new BusinessRuleException("El email del usuario autenticado es obligatorio");

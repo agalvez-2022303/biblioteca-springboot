@@ -28,6 +28,14 @@ public class PrestamoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(prestamoService.crear(request));
     }
 
+    @GetMapping
+    public ResponseEntity<org.springframework.data.domain.Page<PrestamoResponse>> listar(
+            @org.springframework.web.bind.annotation.RequestParam(required = false) Long usuarioId,
+            @org.springframework.web.bind.annotation.RequestParam(required = false) com.albertogalvez.biblioteca.prestamo.entity.EstadoPrestamo estado,
+            @org.springframework.data.web.PageableDefault(sort = "idPrestamo", direction = org.springframework.data.domain.Sort.Direction.DESC) org.springframework.data.domain.Pageable paginable) {
+        return ResponseEntity.ok(prestamoService.listar(usuarioId, estado, paginable));
+    }
+
     @GetMapping("/mis-prestamos")
     public ResponseEntity<org.springframework.data.domain.Page<PrestamoResponse>> misPrestamos(org.springframework.data.domain.Pageable paginable, @org.springframework.web.bind.annotation.RequestParam(required = false) com.albertogalvez.biblioteca.prestamo.entity.EstadoPrestamo estado) {
         org.springframework.security.core.Authentication autenticacion = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();

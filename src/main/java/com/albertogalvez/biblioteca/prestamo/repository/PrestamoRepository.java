@@ -40,6 +40,10 @@ public interface PrestamoRepository extends JpaRepository<PrestamoLibro, Long> {
     @EntityGraph(attributePaths = {"libro", "usuario"})
     Page<PrestamoLibro> findByUsuario_UsuarioId(Long usuarioId, Pageable pageable);
 
+    @EntityGraph(attributePaths = {"libro", "usuario"})
+    @Query("select p from PrestamoLibro p where (:usuarioId is null or p.usuario.usuarioId = :usuarioId) and (:estado is null or p.estado = :estado)")
+    Page<PrestamoLibro> buscar(@Param("usuarioId") Long usuarioId, @Param("estado") EstadoPrestamo estado, Pageable pageable);
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select p from PrestamoLibro p where p.idPrestamo = :id")
     Optional<PrestamoLibro> findByIdConBloqueo(@Param("id") Long id);
