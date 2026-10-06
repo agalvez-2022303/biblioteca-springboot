@@ -1,5 +1,6 @@
 package com.albertogalvez.biblioteca.autenticacion.security;
 
+import com.albertogalvez.biblioteca.usuario.entity.EstadoUsuario;
 import com.albertogalvez.biblioteca.usuario.entity.Usuario;
 import com.albertogalvez.biblioteca.usuario.repository.UsuarioRepository;
 import org.springframework.security.core.userdetails.User;
@@ -25,7 +26,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .username(usuario.getEmail())
                 .password(usuario.getPassword())
                 .roles(usuario.getRol().name())
-                .disabled(usuario.getEstado().name().equals("SANCIONADO"))
+                .disabled(usuario.getEstado() == EstadoUsuario.SANCIONADO)
                 .build();
     }
 }
