@@ -1,5 +1,7 @@
 package com.albertogalvez.biblioteca.autenticacion.controller;
 
+import com.albertogalvez.biblioteca.autenticacion.dto.LoginRequest;
+import com.albertogalvez.biblioteca.autenticacion.dto.LoginResponse;
 import com.albertogalvez.biblioteca.autenticacion.dto.RegisterRequest;
 import com.albertogalvez.biblioteca.autenticacion.dto.RegisterResponse;
 import com.albertogalvez.biblioteca.autenticacion.service.AuthService;
@@ -24,5 +26,11 @@ public class AuthController {
     public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequest request) {
         RegisterResponse respuesta = authService.registrar(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(respuesta);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+        LoginResponse respuesta = authService.login(request);
+        return ResponseEntity.ok(respuesta);
     }
 }
