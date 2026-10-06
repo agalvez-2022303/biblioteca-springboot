@@ -36,8 +36,8 @@ public class PrestamoController {
     }
 
     @GetMapping("/atrasados")
-    public ResponseEntity<java.util.List<PrestamoResponse>> atrasados() {
-        return ResponseEntity.ok(prestamoService.atrasados());
+    public ResponseEntity<org.springframework.data.domain.Page<PrestamoResponse>> atrasados(org.springframework.data.domain.Pageable paginable) {
+        return ResponseEntity.ok(prestamoService.atrasados(paginable));
     }
 
     @PatchMapping("/{id}/devolucion")

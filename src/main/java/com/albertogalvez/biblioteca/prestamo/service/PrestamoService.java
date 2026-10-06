@@ -128,11 +128,10 @@ public class PrestamoService {
     }
 
     @Transactional(readOnly = true)
-    public java.util.List<PrestamoResponse> atrasados() {
-        return prestamoRepository.findByFechaDevolucionEsperadaBeforeAndEstadoNot(LocalDate.now(), EstadoPrestamo.DEVUELTO)
-                .stream()
-                .map(this::aRespuesta)
-                .toList();
+    public org.springframework.data.domain.Page<PrestamoResponse> atrasados(org.springframework.data.domain.Pageable paginable) {
+        java.util.List<EstadoPrestamo> estados = java.util.List.of(EstadoPrestamo.ACTIVO, EstadoPrestamo.ATRASADO);
+        return prestamoRepository.findByFechaDevolucionEsperadaBeforeAndEstadoIn(LocalDate.now(), estados, paginable)
+                .map(this::aRespuesta);
     }
 
     private PrestamoResponse aRespuesta(PrestamoLibro p) {
