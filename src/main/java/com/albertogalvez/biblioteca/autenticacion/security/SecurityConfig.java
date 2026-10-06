@@ -1,5 +1,6 @@
 package com.albertogalvez.biblioteca.autenticacion.security;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -12,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 
 @Configuration
@@ -57,7 +59,7 @@ public class SecurityConfig {
         return http.build();
     }
 
-    private void escribirError(jakarta.servlet.http.HttpServletResponse response, HttpStatus estado, String mensaje) throws java.io.IOException {
+    private void escribirError(HttpServletResponse response, HttpStatus estado, String mensaje) throws IOException {
         response.setStatus(estado.value());
         response.setContentType("application/json;charset=UTF-8");
         String json = "{\"timestamp\":\"" + LocalDateTime.now() + "\",\"status\":" + estado.value()
