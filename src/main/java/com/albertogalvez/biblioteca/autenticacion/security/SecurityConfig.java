@@ -32,6 +32,9 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/v1/auth/register", "/api/v1/auth/login").permitAll()
+                .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/v1/libros").hasRole("ADMIN")
+                .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/v1/libros/*").hasRole("ADMIN")
+                .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/v1/libros/*").hasRole("ADMIN")
                 .requestMatchers("/api/v1/libros/**").authenticated()
                 .requestMatchers("/api/v1/prestamos/**").authenticated()
                 .anyRequest().authenticated()
