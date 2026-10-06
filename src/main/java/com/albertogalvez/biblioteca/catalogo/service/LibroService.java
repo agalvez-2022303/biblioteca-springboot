@@ -6,6 +6,7 @@ import com.albertogalvez.biblioteca.catalogo.entity.Libro;
 import com.albertogalvez.biblioteca.catalogo.repository.LibroRepository;
 import com.albertogalvez.biblioteca.comun.exception.BusinessRuleException;
 import com.albertogalvez.biblioteca.comun.exception.ResourceNotFoundException;
+import com.albertogalvez.biblioteca.comun.validacion.Validaciones;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -99,15 +100,9 @@ public class LibroService {
         if (request == null) {
             throw new BusinessRuleException("La solicitud es obligatoria");
         }
-        if (request.titulo() == null || request.titulo().isBlank()) {
-            throw new BusinessRuleException("El título es obligatorio");
-        }
-        if (request.autor() == null || request.autor().isBlank()) {
-            throw new BusinessRuleException("El autor es obligatorio");
-        }
-        if (request.categoria() == null || request.categoria().isBlank()) {
-            throw new BusinessRuleException("La categoría es obligatoria");
-        }
+        Validaciones.texto(request.titulo(), "El título es obligatorio", "El título no puede superar", 200);
+        Validaciones.texto(request.autor(), "El autor es obligatorio", "El autor no puede superar", 150);
+        Validaciones.texto(request.categoria(), "La categoría es obligatoria", "La categoría no puede superar", 100);
         if (request.stockTotal() == null) {
             throw new BusinessRuleException("El stock total es obligatorio");
         }
