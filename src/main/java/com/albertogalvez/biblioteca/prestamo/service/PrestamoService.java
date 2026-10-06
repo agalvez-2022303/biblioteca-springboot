@@ -150,8 +150,14 @@ public class PrestamoService {
                 .map(this::aRespuesta);
     }
 
+    // El proceso programado persiste ATRASADO cada cierto tiempo; mientras tanto, un prestamo ACTIVO
+    // con fecha vencida se informa como ATRASADO para que la respuesta sea siempre coherente.
     private PrestamoResponse aRespuesta(PrestamoLibro p) {
+        EstadoPrestamo estado = p.getEstado();
+        if (estado == EstadoPrestamo.ACTIVO && p.getFechaDevolucionEsperada().isBefore(LocalDate.now())) {
+            estado = EstadoPrestamo.ATRASADO;
+        }
         return new PrestamoResponse(p.getIdPrestamo(), p.getUsuario().getUsuarioId(), p.getLibro().getLibroId(),
-                p.getFechaPrestamo(), p.getFechaDevolucionEsperada(), p.getFechaDevolucionReal(), p.getEstado());
+                p.getFechaPrestamo(), p.getFechaDevolucionEsperada(), p.getFechaDevolucionReal(), estado);
     }
 }
