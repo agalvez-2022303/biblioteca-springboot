@@ -13,11 +13,13 @@ import java.util.Optional;
 
 public interface LibroRepository extends JpaRepository<Libro, Long> {
 
-    Page<Libro> findByTituloContainingIgnoreCase(String titulo, Pageable pageable);
+    Page<Libro> findByActivoTrue(Pageable pageable);
 
-    Page<Libro> findByCategoriaIgnoreCase(String categoria, Pageable pageable);
+    Page<Libro> findByActivoTrueAndTituloContainingIgnoreCase(String titulo, Pageable pageable);
 
-    Page<Libro> findByTituloContainingIgnoreCaseAndCategoriaIgnoreCase(String titulo, String categoria, Pageable pageable);
+    Page<Libro> findByActivoTrueAndCategoriaIgnoreCase(String categoria, Pageable pageable);
+
+    Page<Libro> findByActivoTrueAndTituloContainingIgnoreCaseAndCategoriaIgnoreCase(String titulo, String categoria, Pageable pageable);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select l from Libro l where l.libroId = :id")

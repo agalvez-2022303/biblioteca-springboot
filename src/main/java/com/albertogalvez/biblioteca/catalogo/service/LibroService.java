@@ -27,13 +27,13 @@ public class LibroService {
         boolean hayCategoria = categoria != null && !categoria.isBlank();
 
         if (hayTitulo && hayCategoria) {
-            pagina = libroRepository.findByTituloContainingIgnoreCaseAndCategoriaIgnoreCase(titulo, categoria, paginable);
+            pagina = libroRepository.findByActivoTrueAndTituloContainingIgnoreCaseAndCategoriaIgnoreCase(titulo, categoria, paginable);
         } else if (hayTitulo) {
-            pagina = libroRepository.findByTituloContainingIgnoreCase(titulo, paginable);
+            pagina = libroRepository.findByActivoTrueAndTituloContainingIgnoreCase(titulo, paginable);
         } else if (hayCategoria) {
-            pagina = libroRepository.findByCategoriaIgnoreCase(categoria, paginable);
+            pagina = libroRepository.findByActivoTrueAndCategoriaIgnoreCase(categoria, paginable);
         } else {
-            pagina = libroRepository.findAll(paginable);
+            pagina = libroRepository.findByActivoTrue(paginable);
         }
         return pagina.map(this::aRespuesta);
     }
@@ -44,6 +44,7 @@ public class LibroService {
             throw new BusinessRuleException("El ID del libro es obligatorio");
         }
         Libro libro = libroRepository.findById(id)
+                .filter(l -> Boolean.TRUE.equals(l.getActivo()))
                 .orElseThrow(() -> new ResourceNotFoundException("Libro no encontrado con id: " + id));
         return aRespuesta(libro);
     }
@@ -67,15 +68,19 @@ public class LibroService {
             throw new BusinessRuleException("El ID del libro es obligatorio");
         }
         validar(request);
-        Libro libro = libroRepository.findById(id)
+        Libro libro = libroRepository.findByIdConBloqueo(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Libro no encontrado con id: " + id));
+
+        int prestados = libro.getStockTotal() - libro.getStockDisponible();
+        if (request.stockTotal() < prestados) {
+            throw new BusinessRuleException("El stock total no puede ser menor a los ejemplares prestados (" + prestados + ")");
+        }
+
         libro.setTitulo(request.titulo());
         libro.setAutor(request.autor());
         libro.setCategoria(request.categoria());
-        if (request.stockTotal() < libro.getStockDisponible()) {
-            throw new BusinessRuleException("El stock total no puede ser menor al stock disponible");
-        }
         libro.setStockTotal(request.stockTotal());
+        libro.setStockDisponible(request.stockTotal() - prestados);
         return aRespuesta(libroRepository.save(libro));
     }
 
@@ -84,7 +89,7 @@ public class LibroService {
         if (id == null) {
             throw new BusinessRuleException("El ID del libro es obligatorio");
         }
-        Libro libro = libroRepository.findById(id)
+        Libro libro = libroRepository.findByIdConBloqueo(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Libro no encontrado con id: " + id));
         libro.setActivo(false);
         libroRepository.save(libro);
