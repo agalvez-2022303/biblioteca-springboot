@@ -29,10 +29,10 @@ public class PrestamoController {
     }
 
     @GetMapping("/mis-prestamos")
-    public ResponseEntity<java.util.List<PrestamoResponse>> misPrestamos() {
+    public ResponseEntity<org.springframework.data.domain.Page<PrestamoResponse>> misPrestamos(org.springframework.data.domain.Pageable paginable) {
         org.springframework.security.core.Authentication autenticacion = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
         String email = autenticacion == null ? null : autenticacion.getName();
-        return ResponseEntity.ok(prestamoService.misPrestamos(email));
+        return ResponseEntity.ok(prestamoService.misPrestamos(email, paginable));
     }
 
     @GetMapping("/atrasados")
