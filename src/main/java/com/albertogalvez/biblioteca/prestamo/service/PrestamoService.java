@@ -83,6 +83,35 @@ public class PrestamoService {
         return aRespuesta(guardado);
     }
 
+    @Transactional
+    public PrestamoResponse devolver(Long idPrestamo) {
+        if (idPrestamo == null) {
+            throw new BusinessRuleException("El ID del préstamo es obligatorio");
+        }
+
+        PrestamoLibro prestamo = prestamoRepository.findById(idPrestamo)
+                .orElseThrow(() -> new ResourceNotFoundException("Préstamo no encontrado con id: " + idPrestamo));
+
+        if (prestamo.getEstado() == EstadoPrestamo.DEVUELTO) {
+            throw new BusinessRuleException("El préstamo ya fue devuelto");
+        }
+
+        Libro libro = libroRepository.findByIdConBloqueo(prestamo.getLibro().getLibroId())
+                .orElseThrow(() -> new ResourceNotFoundException("Libro no encontrado con id: " + prestamo.getLibro().getLibroId()));
+
+        prestamo.setFechaDevolucionReal(LocalDate.now());
+        prestamo.setEstado(EstadoPrestamo.DEVUELTO);
+
+        int nuevoStock = libro.getStockDisponible() + 1;
+        if (nuevoStock > libro.getStockTotal()) {
+            throw new BusinessRuleException("Inconsistencia de stock: el stock disponible no puede superar al total");
+        }
+        libro.setStockDisponible(nuevoStock);
+
+        libroRepository.save(libro);
+        return aRespuesta(prestamoRepository.save(prestamo));
+    }
+
     private PrestamoResponse aRespuesta(PrestamoLibro p) {
         return new PrestamoResponse(p.getIdPrestamo(), p.getUsuario().getUsuarioId(), p.getLibro().getLibroId(),
                 p.getFechaPrestamo(), p.getFechaDevolucionEsperada(), p.getFechaDevolucionReal(), p.getEstado());

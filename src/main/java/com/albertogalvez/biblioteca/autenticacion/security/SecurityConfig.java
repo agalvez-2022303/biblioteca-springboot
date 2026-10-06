@@ -37,6 +37,7 @@ public class SecurityConfig {
                 .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/v1/libros/*").hasRole("ADMIN")
                 .requestMatchers("/api/v1/libros/**").authenticated()
                 .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/v1/prestamos").hasAnyRole("ADMIN", "BIBLIOTECARIO")
+                .requestMatchers(org.springframework.http.HttpMethod.PATCH, "/api/v1/prestamos/*/devolucion").hasAnyRole("ADMIN", "BIBLIOTECARIO")
                 .requestMatchers("/api/v1/prestamos/**").authenticated()
                 .anyRequest().authenticated()
             )

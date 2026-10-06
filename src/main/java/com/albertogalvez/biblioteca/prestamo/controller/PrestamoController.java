@@ -5,6 +5,8 @@ import com.albertogalvez.biblioteca.prestamo.dto.PrestamoResponse;
 import com.albertogalvez.biblioteca.prestamo.service.PrestamoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,5 +25,10 @@ public class PrestamoController {
     @PostMapping
     public ResponseEntity<PrestamoResponse> crear(@RequestBody PrestamoRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(prestamoService.crear(request));
+    }
+
+    @PatchMapping("/{id}/devolucion")
+    public ResponseEntity<PrestamoResponse> devolver(@PathVariable Long id) {
+        return ResponseEntity.ok(prestamoService.devolver(id));
     }
 }
