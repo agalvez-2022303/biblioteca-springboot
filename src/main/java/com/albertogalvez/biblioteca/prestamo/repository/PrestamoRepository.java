@@ -24,6 +24,9 @@ public interface PrestamoRepository extends JpaRepository<PrestamoLibro, Long> {
     List<PrestamoLibro> findByFechaDevolucionEsperadaBeforeAndEstadoNot(LocalDate fecha, EstadoPrestamo estado);
 
     @EntityGraph(attributePaths = {"libro", "usuario"})
+    Page<PrestamoLibro> findByUsuario_UsuarioIdAndEstado(Long usuarioId, EstadoPrestamo estado, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"libro", "usuario"})
     Page<PrestamoLibro> findByUsuario_UsuarioId(Long usuarioId, Pageable pageable);
 
     @org.springframework.data.jpa.repository.Modifying(clearAutomatically = true)

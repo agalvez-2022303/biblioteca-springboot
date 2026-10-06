@@ -113,12 +113,16 @@ public class PrestamoService {
     }
 
     @Transactional(readOnly = true)
-    public org.springframework.data.domain.Page<PrestamoResponse> misPrestamos(String email, org.springframework.data.domain.Pageable paginable) {
+    public org.springframework.data.domain.Page<PrestamoResponse> misPrestamos(String email, org.springframework.data.domain.Pageable paginable, EstadoPrestamo estado) {
         if (email == null || email.isBlank()) {
             throw new BusinessRuleException("El email del usuario autenticado es obligatorio");
         }
         Usuario usuario = usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con email: " + email));
+        if (estado != null) {
+            return prestamoRepository.findByUsuario_UsuarioIdAndEstado(usuario.getUsuarioId(), estado, paginable)
+                    .map(this::aRespuesta);
+        }
         return prestamoRepository.findByUsuario_UsuarioId(usuario.getUsuarioId(), paginable)
                 .map(this::aRespuesta);
     }
